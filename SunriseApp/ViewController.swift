@@ -10,17 +10,32 @@ import UIKit
 
 class ViewController: UIViewController {
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        // Do any additional setup after loading the view.
-    }
 
     @IBOutlet weak var cityNameInput: UITextField!
-    
     @IBOutlet weak var suriseTimeLabel: UILabel!
     @IBAction func findSunrise(_ sender: Any) {
         let url = "http://api.openweathermap.org/data/2.5/forecast?q=\(cityNameInput.text!)&appid=c12b7aa47f8707c2f43fb3c51f1e0ba9"
         getURL(url:url)
+    }
+    @IBOutlet weak var pushButton: UIButton!
+    @IBOutlet weak var popButton: UIButton!
+    @IBOutlet weak var modalButton: UIButton!
+    @IBOutlet weak var dismissButton: UIBarButtonItem!
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        // Do any additional setup after loading the view.
+        pushButton.addTarget(self, action: #selector(ViewController.pushButtonTapped(_:)), for: .touchUpInside)
+        popButton.isEnabled = navigationController!.children.count > 1
+        popButton.addTarget(self, action: #selector(ViewController.popButtonTapped(_:)),for:.touchUpInside)
+        
+        modalButton.addTarget(self, action: #selector(ViewController.modalButtonTapped(_:)), for: .touchUpInside)
+        dismissButton.isEnabled = presentingViewController != nil
+        
+        dismissButton.target = self
+        dismissButton.action = #selector(ViewController.dismissButtonTapped(_:))
+        
+        NSLog("\(navigationController?.children)")
     }
     
     func getURL(url:String){
@@ -41,6 +56,25 @@ class ViewController: UIViewController {
         } catch{
             self.suriseTimeLabel.text = "サーバーに接続できません"
         }
+    }
+    
+    @objc func pushButtonTapped(_ sender: Any){
+        let nvc = UIStoryboard(name: "Main", bundle: Bundle.main).instantiateInitialViewController() as! UINavigationController
+        let vc = nvc.children[0] as! ViewController
+        navigationController?.pushViewController(vc, animated: true)
+    }
+    
+    @objc func popButtonTapped(_ sender:Any){
+        _ = navigationController?.popViewController(animated: true)
+    }
+    
+    @objc func modalButtonTapped(_ sender:Any){
+        let nvc = UIStoryboard(name:"Main",bundle: Bundle.main).instantiateInitialViewController() as! UINavigationController
+        present(nvc,animated: true,completion: nil)
+    }
+    
+    @objc func dismissButtonTapped(_ sender:Any){
+        dismiss(animated: true,completion: nil)
     }
 }
 
